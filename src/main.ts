@@ -3,10 +3,8 @@ import scene from '~/scenes/index'
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   scale: {
-    mode: Phaser.Scale.NONE,
-    autoCenter: Phaser.Scale.CENTER_BOTH,
     parent: 'root',
-    width: 800,
+    width: 700,
     height: 600
   },
   physics: {
