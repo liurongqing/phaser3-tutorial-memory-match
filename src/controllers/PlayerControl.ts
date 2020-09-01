@@ -1,27 +1,31 @@
 export default class PlayerController {
-  shouldSortChildren: true
+
+  cursors: Phaser.Types.Input.Keyboard.CursorKeys
+  shouldSortChildren = true
   boxOpenCallback: () => void
 
-  constructor(boxOpenCallback: () => void) {
+  constructor(cursors: Phaser.Types.Input.Keyboard.CursorKeys, boxOpenCallback: () => void) {
+    this.cursors = cursors
     this.boxOpenCallback = boxOpenCallback
   }
 
-  update(cursors: Phaser.Types.Input.Keyboard.CursorKeys, player: Phaser.Physics.Arcade.Sprite) {
+
+  update(player: Phaser.Physics.Arcade.Sprite) {
     if (!player.active) return
     const speed = 200
-    if (cursors.left.isDown) {
+    if (this.cursors.left.isDown) {
       player.setVelocity(-speed, 0)
       player.play('left-walk', true)
       this.shouldSortChildren = true
-    } else if (cursors.right.isDown) {
+    } else if (this.cursors.right.isDown) {
       player.setVelocity(speed, 0)
       player.play('right-walk', true)
       this.shouldSortChildren = true
-    } else if (cursors.up.isDown) {
+    } else if (this.cursors.up.isDown) {
       player.setVelocity(0, -speed)
       player.play('up-walk', true)
       this.shouldSortChildren = true
-    } else if (cursors.down.isDown) {
+    } else if (this.cursors.down.isDown) {
       player.setVelocity(0, speed)
       player.play('down-walk', true)
       this.shouldSortChildren = true
@@ -32,9 +36,13 @@ export default class PlayerController {
       const direction = parts[0]
       player.play(`${direction}-idle`, true)
     }
-    const spaceJustPressed = Phaser.Input.Keyboard.JustUp(cursors.space)
+    const spaceJustPressed = Phaser.Input.Keyboard.JustUp(this.cursors.space)
     if (spaceJustPressed && this.boxOpenCallback) {
       this.boxOpenCallback()
     }
+  }
+
+  setChildrenSorted() {
+    this.shouldSortChildren = false
   }
 }

@@ -15,7 +15,10 @@ const config: Phaser.Types.Core.GameConfig = {
       gravity: { y: 0 }
     }
   },
-  scene
+  scene,
+  input: {
+    gamepad: true
+  }
 }
 
 export default new Phaser.Game(config)

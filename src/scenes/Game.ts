@@ -1,6 +1,8 @@
-import { SceneKeys, TextureKeys } from '~/consts/index'
-import CountdownController from '~/controllers/CountdownController'
-import PlayerController from "~/controllers/PlayerController";
+import { SceneKeys, TextureKeys, SoundKeys } from '~/consts/index'
+import CountdownControl from '~/controllers/CountdownControl'
+import PlayerControl from "~/controllers/PlayerControl";
+import GamepadControl from "~/controllers/GamepadControl";
+import { fadeIn, fadeOut } from '~/controllers/MusicUrils'
 
 const level = [
   [1, 0, 3],
@@ -17,7 +19,7 @@ export default class Game extends Phaser.Scene {
   matchesCount: number
   countdown: any
   control: any
-  shouldSortChildren = true
+  music: Phaser.Sound.WebAudioSound
 
   constructor() {
     super(SceneKeys.GAME)
@@ -26,6 +28,19 @@ export default class Game extends Phaser.Scene {
   init() {
     this.cursors = this.input.keyboard.createCursorKeys()
     this.matchesCount = 0
+
+    this.input.gamepad.on(Phaser.Input.Gamepad.Events.CONNECTED, (pad) => {
+      if (!this.control || !this.control.setGamepad) return
+      this.control.setGamepad(pad)
+    })
+
+    this.music = this.sound.add(SoundKeys.MUSIC, {
+      loop: true,
+      volume: 0.1
+    }) as any
+
+    this.music.play()
+    fadeIn(this, this.music, 0.1, 2000)
   }
 
   create() {
@@ -52,23 +67,27 @@ export default class Game extends Phaser.Scene {
     })
       .setOrigin(0.5)
 
-    this.countdown = new CountdownController(this, timerLabel)
-    this.countdown.start(this.handleCountdownFinished.bind(this), 10000)
+    this.countdown = new CountdownControl(this, timerLabel)
+    this.countdown.start(this.handleCountdownFinished.bind(this), 100000)
 
-    this.control = new PlayerController(this.handlePlayerOpenActiveBox.bind(this))
+    this.control = new PlayerControl(
+      this.cursors,
+      this.handlePlayerOpenActiveBox.bind(this)
+    )
+    // this.control = new GamepadControl(this.handlePlayerOpenActiveBox.bind(this))
   }
 
   update() {
-    this.control.update(this.cursors, this.player)
+    this.control.update(this.player)
     this.updateActiveBox()
 
-    if (this.shouldSortChildren) {
+    if (this.control.shouldSortChildren) {
       this.children.each(c => {
         const child = c as Phaser.Physics.Arcade.Sprite
         if (child.getData('sorted')) return
         child.setDepth(child.y)
       })
-      this.shouldSortChildren = false
+      this.control.setChildrenSorted()
     }
 
     this.countdown.update()
@@ -154,6 +173,9 @@ export default class Game extends Phaser.Scene {
       box,
       item
     })
+    this.sound.play(SoundKeys.SFX_BOX_SELECT, {
+      volume: 0.8
+    })
 
     this.tweens.add({
       targets: item,
@@ -196,22 +218,34 @@ export default class Game extends Phaser.Scene {
     }
 
     ++this.matchesCount
+
     this.time.delayedCall(1000, () => {
       first.box.setFrame(8)
       second.box.setFrame(8)
+      this.sound.play(SoundKeys.SFX_MATCH, {
+        volume: 0.8
+      })
 
-      if (this.matchesCount >= 4) {
-        this.player.active = false
-        this.player.setVelocity(0, 0)
+      this.time.delayedCall(1000, () => {
+        if (this.matchesCount >= 4) {
+          fadeOut(this, this.music, 2000)
+          this.sound.play(SoundKeys.SFX_VICTORY, {
+            volume: 0.8
+          })
+          this.countdown.stop()
 
-        this.countdown.stop()
+          this.player.active = false
+          this.player.setVelocity(0, 0)
 
-        const { width, height } = this.scale
-        this.add.text(width * 0.5, height * 0.5, 'You Win!', {
-          fontSize: 48
-        })
-          .setOrigin(0.5)
-      }
+
+          const { width, height } = this.scale
+          this.add.text(width * 0.5, height * 0.5, 'You Win!', {
+            fontSize: 48
+          })
+            .setOrigin(0.5)
+            .setDepth(3000)
+        }
+      })
     })
   }
 
@@ -242,6 +276,10 @@ export default class Game extends Phaser.Scene {
   }
 
   handleCountdownFinished() {
+    fadeOut(this, this.music, 2000)
+    this.sound.play(SoundKeys.SFX_GAMEOVER, {
+      volume: 0.8
+    })
     const { width, height } = this.scale
     this.player.active = false
     this.player.setVelocity(0, 0)
@@ -250,6 +288,7 @@ export default class Game extends Phaser.Scene {
       fontSize: 48
     })
       .setOrigin(0.5)
+      .setDepth(3000)
   }
 
 }

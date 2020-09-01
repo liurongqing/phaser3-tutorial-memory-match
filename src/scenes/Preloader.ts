@@ -1,4 +1,4 @@
-import { SceneKeys, TextureKeys } from "~/consts/index";
+import { SceneKeys, TextureKeys, SoundKeys } from "~/consts/index";
 
 export default class Preloader extends Phaser.Scene {
 
@@ -15,6 +15,13 @@ export default class Preloader extends Phaser.Scene {
     this.load.image(TextureKeys.DUCK, 'assets/textures/duck.png')
     this.load.image(TextureKeys.PARROT, 'assets/textures/parrot.png')
     this.load.image(TextureKeys.PENGUIN, 'assets/textures/penguin.png')
+
+    this.load.audio(SoundKeys.MUSIC, 'assets/music/8Bit-Mini-Gamer-Loop.wav')
+    this.load.audio(SoundKeys.SFX_BOX_SELECT, 'assets/sfx/Pickup-Soft.wav')
+    this.load.audio(SoundKeys.SFX_GAMEOVER, 'assets/sfx/GameOver.wav')
+    this.load.audio(SoundKeys.SFX_MATCH, 'assets/sfx/Ice-Reflect.wav')
+    this.load.audio(SoundKeys.SFX_VICTORY, 'assets/sfx/Victory-SoundFX1.wav')
+
   }
 
   create() {
