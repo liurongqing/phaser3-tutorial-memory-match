@@ -4,14 +4,15 @@ const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   scale: {
     parent: 'root',
-    width: 700,
-    height: 600
+    width: 800,
+    height: 600,
+    autoCenter: Phaser.Scale.CENTER_BOTH
   },
   physics: {
     default: 'arcade',
     arcade: {
       debug: true,
-      gravity: { y: 200 }
+      gravity: { y: 0 }
     }
   },
   scene
