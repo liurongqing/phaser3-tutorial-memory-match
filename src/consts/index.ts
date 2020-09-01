@@ -1,1 +1,2 @@
-export * as Keys from './Keys'
+export * as SceneKeys from './SceneKeys'
+export * as TextureKeys from './TextureKeys'

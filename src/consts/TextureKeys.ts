@@ -1,0 +1,6 @@
+export const BEAR = 'bear'
+export const CHICKEN = 'chicken'
+export const PARROT = 'parrot'
+export const DUCK = 'duck'
+export const PENGUIN = 'penguin'
+export const SOKOBAN = 'sokoban'

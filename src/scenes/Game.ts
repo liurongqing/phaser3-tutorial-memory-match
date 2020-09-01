@@ -1,4 +1,6 @@
-import { Keys } from '~/consts/index'
+import { SceneKeys, TextureKeys } from '~/consts/index'
+import CountdownController from '~/controllers/CountdownController'
+import PlayerController from "~/controllers/PlayerController";
 
 const level = [
   [1, 0, 3],
@@ -6,7 +8,6 @@ const level = [
   [3, 4, 2]
 ]
 export default class Game extends Phaser.Scene {
-
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys
   player!: Phaser.Physics.Arcade.Sprite
   boxGroup!: Phaser.Physics.Arcade.StaticGroup
@@ -14,9 +15,12 @@ export default class Game extends Phaser.Scene {
   itemsGroup!: Phaser.GameObjects.Group
   selectedBoxes = []
   matchesCount: number
+  countdown: any
+  control: any
+  shouldSortChildren = true
 
   constructor() {
-    super(Keys.GameScene)
+    super(SceneKeys.GAME)
   }
 
   init() {
@@ -26,7 +30,7 @@ export default class Game extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale
-    this.player = this.physics.add.sprite(width * 0.5, height * 0.63, 'sokoban')
+    this.player = this.physics.add.sprite(width * 0.5, height * 0.63, TextureKeys.SOKOBAN)
       .setSize(40, 16)
       .setOffset(12, 38)
       .play('down-idle')
@@ -42,18 +46,32 @@ export default class Game extends Phaser.Scene {
       this)
 
     this.itemsGroup = this.add.group()
+
+    const timerLabel = this.add.text(width * 0.5, 50, '', {
+      fontSize: 48
+    })
+      .setOrigin(0.5)
+
+    this.countdown = new CountdownController(this, timerLabel)
+    this.countdown.start(this.handleCountdownFinished.bind(this), 10000)
+
+    this.control = new PlayerController(this.handlePlayerOpenActiveBox.bind(this))
   }
 
   update() {
-    this.updatePlayer()
-
+    this.control.update(this.cursors, this.player)
     this.updateActiveBox()
 
-    this.children.each(c => {
-      const child = c as Phaser.Physics.Arcade.Sprite
-      if (child.getData('sorted')) return
-      child.setDepth(child.y)
-    })
+    if (this.shouldSortChildren) {
+      this.children.each(c => {
+        const child = c as Phaser.Physics.Arcade.Sprite
+        if (child.getData('sorted')) return
+        child.setDepth(child.y)
+      })
+      this.shouldSortChildren = false
+    }
+
+    this.countdown.update()
   }
 
   createdBoxes() {
@@ -62,7 +80,7 @@ export default class Game extends Phaser.Scene {
     let y = 150
     for (let row = 0; row < level.length; ++row) {
       for (let col = 0; col < level[row].length; ++col) {
-        const box = this.boxGroup.get(width * xPer, y, 'sokoban', 10)
+        const box = this.boxGroup.get(width * xPer, y, TextureKeys.SOKOBAN, 10)
         box.setSize(64, 32)
           .setOffset(0, 32)
           .setData('itemType', level[row][col])
@@ -81,34 +99,8 @@ export default class Game extends Phaser.Scene {
     this.activeBox.setFrame(9)
   }
 
-  updatePlayer() {
-    if (!this.player.active) return
-    const speed = 200
-    if (this.cursors.left.isDown) {
-      this.player.setVelocity(-speed, 0)
-      this.player.play('left-walk', true)
-    } else if (this.cursors.right.isDown) {
-      this.player.setVelocity(speed, 0)
-      this.player.play('right-walk', true)
-    } else if (this.cursors.up.isDown) {
-      this.player.setVelocity(0, -speed)
-      this.player.play('up-walk', true)
-    } else if (this.cursors.down.isDown) {
-      this.player.setVelocity(0, speed)
-      this.player.play('down-walk', true)
-    } else {
-      this.player.setVelocity(0, 0)
-      const key = this.player.anims.currentAnim.key
-      const parts = key.split('-')
-      const direction = parts[0]
-      this.player.play(`${direction}-idle`, true)
-    }
-    const spaceJustPressed = Phaser.Input.Keyboard.JustUp(this.cursors.space)
-    if (spaceJustPressed && this.activeBox) {
-      this.openBox(this.activeBox)
-      this.activeBox.setFrame(10)
-      this.activeBox = undefined
-    }
+  handlePlayerOpenActiveBox() {
+    this.openBox(this.activeBox)
   }
 
   updateActiveBox() {
@@ -129,23 +121,23 @@ export default class Game extends Phaser.Scene {
     switch (itemType) {
       case 0:
         item = this.itemsGroup.get(box.x, box.y)
-        item.setTexture('bear')
+        item.setTexture(TextureKeys.BEAR)
         break;
       case 1:
         item = this.itemsGroup.get(box.x, box.y)
-        item.setTexture('chicken')
+        item.setTexture(TextureKeys.CHICKEN)
         break;
       case 2:
         item = this.itemsGroup.get(box.x, box.y)
-        item.setTexture('duck')
+        item.setTexture(TextureKeys.DUCK)
         break;
       case 3:
         item = this.itemsGroup.get(box.x, box.y)
-        item.setTexture('parrot')
+        item.setTexture(TextureKeys.PARROT)
         break;
       case 4:
         item = this.itemsGroup.get(box.x, box.y)
-        item.setTexture('penguin')
+        item.setTexture(TextureKeys.PENGUIN)
         break;
     }
     box.setData('opened', true)
@@ -212,6 +204,8 @@ export default class Game extends Phaser.Scene {
         this.player.active = false
         this.player.setVelocity(0, 0)
 
+        this.countdown.stop()
+
         const { width, height } = this.scale
         this.add.text(width * 0.5, height * 0.5, 'You Win!', {
           fontSize: 48
@@ -245,6 +239,17 @@ export default class Game extends Phaser.Scene {
         }
       })
     })
+  }
+
+  handleCountdownFinished() {
+    const { width, height } = this.scale
+    this.player.active = false
+    this.player.setVelocity(0, 0)
+
+    this.add.text(width * 0.5, height * 0.5, 'You Lose', {
+      fontSize: 48
+    })
+      .setOrigin(0.5)
   }
 
 }

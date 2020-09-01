@@ -1,41 +1,41 @@
-import { Keys } from "~/consts/index";
+import { SceneKeys, TextureKeys } from "~/consts/index";
 
 export default class Preloader extends Phaser.Scene {
 
   constructor() {
-    super(Keys.PreloadScene)
+    super(SceneKeys.PRELOADER)
   }
 
   preload() {
     this.load.spritesheet('sokoban', 'assets/textures/sokoban_tilesheet.png', {
       frameWidth: 64
     })
-    this.load.image('bear', 'assets/textures/bear.png')
-    this.load.image('chicken', 'assets/textures/chicken.png')
-    this.load.image('duck', 'assets/textures/duck.png')
-    this.load.image('parrot', 'assets/textures/parrot.png')
-    this.load.image('penguin', 'assets/textures/penguin.png')
+    this.load.image(TextureKeys.BEAR, 'assets/textures/bear.png')
+    this.load.image(TextureKeys.CHICKEN, 'assets/textures/chicken.png')
+    this.load.image(TextureKeys.DUCK, 'assets/textures/duck.png')
+    this.load.image(TextureKeys.PARROT, 'assets/textures/parrot.png')
+    this.load.image(TextureKeys.PENGUIN, 'assets/textures/penguin.png')
   }
 
   create() {
     this.anims.create({
       key: 'down-idle',
-      frames: [{ key: 'sokoban', frame: 52 }]
+      frames: [{ key: TextureKeys.SOKOBAN, frame: 52 }]
     })
 
     this.anims.create({
       key: 'up-idle',
-      frames: [{ key: 'sokoban', frame: 55 }]
+      frames: [{ key: TextureKeys.SOKOBAN, frame: 55 }]
     })
 
     this.anims.create({
       key: 'left-idle',
-      frames: [{ key: 'sokoban', frame: 81 }]
+      frames: [{ key: TextureKeys.SOKOBAN, frame: 81 }]
     })
 
     this.anims.create({
       key: 'right-idle',
-      frames: [{ key: 'sokoban', frame: 78 }]
+      frames: [{ key: TextureKeys.SOKOBAN, frame: 78 }]
     })
 
     this.anims.create({
@@ -74,6 +74,6 @@ export default class Preloader extends Phaser.Scene {
       repeat: -1
     })
 
-    this.scene.start(Keys.GameScene)
+    this.scene.start(SceneKeys.GAME)
   }
 }
