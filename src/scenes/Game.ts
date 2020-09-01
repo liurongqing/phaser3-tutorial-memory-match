@@ -12,6 +12,8 @@ export default class Game extends Phaser.Scene {
   boxGroup!: Phaser.Physics.Arcade.StaticGroup
   activeBox?: Phaser.Physics.Arcade.Sprite
   itemsGroup!: Phaser.GameObjects.Group
+  selectedBoxes = []
+  matchesCount: number
 
   constructor() {
     super(Keys.GameScene)
@@ -19,11 +21,11 @@ export default class Game extends Phaser.Scene {
 
   init() {
     this.cursors = this.input.keyboard.createCursorKeys()
+    this.matchesCount = 0
   }
 
   create() {
     const { width, height } = this.scale
-    this.cameras.main.setBackgroundColor(0xffffff)
     this.player = this.physics.add.sprite(width * 0.5, height * 0.63, 'sokoban')
       .setSize(40, 16)
       .setOffset(12, 38)
@@ -49,6 +51,7 @@ export default class Game extends Phaser.Scene {
 
     this.children.each(c => {
       const child = c as Phaser.Physics.Arcade.Sprite
+      if (child.getData('sorted')) return
       child.setDepth(child.y)
     })
   }
@@ -71,12 +74,15 @@ export default class Game extends Phaser.Scene {
   }
 
   handlePlayerBoxCollide(player: Phaser.Physics.Arcade.Sprite, box: Phaser.Physics.Arcade.Sprite) {
+    const opened = box.getData('opened')
+    if (opened) return
     if (this.activeBox) return
     this.activeBox = box
     this.activeBox.setFrame(9)
   }
 
   updatePlayer() {
+    if (!this.player.active) return
     const speed = 200
     if (this.cursors.left.isDown) {
       this.player.setVelocity(-speed, 0)
@@ -143,18 +149,102 @@ export default class Game extends Phaser.Scene {
         break;
     }
     box.setData('opened', true)
+    item.setData('sorted', true)
+    item.setDepth(2000)
+
+    item.setActive(true)
+    item.setVisible(true)
 
     item.setScale(0)
-      .setAlpha(0)
+    item.setAlpha(0)
+
+    this.selectedBoxes.push({
+      box,
+      item
+    })
 
     this.tweens.add({
       targets: item,
       y: '-=50',
       alpha: 1,
       scale: 1,
-      duration: 500
+      duration: 500,
+      onComplete: () => {
+        if (itemType === 0) {
+          this.handleBearSelected()
+          return
+        }
+        if (this.selectedBoxes.length < 2) return
+        this.checkForMatch()
+      }
     })
 
+  }
+
+  checkForMatch() {
+    const second = this.selectedBoxes.pop()
+    const first = this.selectedBoxes.pop()
+    if (first.item.texture !== second.item.texture) {
+      this.tweens.add({
+        targets: [first.item, second.item],
+        y: '+=50',
+        alpha: 0,
+        scale: 0,
+        duration: 300,
+        delay: 1000,
+        onComplete: () => {
+          this.itemsGroup.killAndHide(first.item)
+          this.itemsGroup.killAndHide(second.item)
+
+          first.box.setData('opened', false)
+          second.box.setData('opened', false)
+        }
+      })
+      return
+    }
+
+    ++this.matchesCount
+    this.time.delayedCall(1000, () => {
+      first.box.setFrame(8)
+      second.box.setFrame(8)
+
+      if (this.matchesCount >= 4) {
+        this.player.active = false
+        this.player.setVelocity(0, 0)
+
+        const { width, height } = this.scale
+        this.add.text(width * 0.5, height * 0.5, 'You Win!', {
+          fontSize: 48
+        })
+          .setOrigin(0.5)
+      }
+    })
+  }
+
+  handleBearSelected() {
+    const { box, item } = this.selectedBoxes.pop()
+    item.setTint(0xff0000)
+    box.setFrame(7)
+
+    this.player.active = false
+    this.player.setVelocity(0, 0)
+
+    this.time.delayedCall(1000, () => {
+      item.setTint(0xffffff)
+      box.setFrame(10)
+      box.setData('opened', false)
+
+      this.tweens.add({
+        targets: item,
+        y: '+=50',
+        alpha: 0,
+        scale: 0,
+        duration: 300,
+        onComplete: () => {
+          this.player.active = true
+        }
+      })
+    })
   }
 
 }

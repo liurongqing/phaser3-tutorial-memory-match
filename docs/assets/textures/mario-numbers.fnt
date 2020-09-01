@@ -1,0 +1,22 @@
+<?xml version='1.0'?>
+   <font>
+       <info aa='1' size='50' smooth='1' stretchH='100' bold='0' padding='0,0,0,0' spacing='0,0' charset='' italic='0' unicode='0' face='Super Mario 286'/>
+       <common scaleW='192' packed='0' pages='1' lineHeight='67' scaleH='192' base='55'/>
+       <pages>
+            <page id='0' file='mario-numbers.png'/>
+       </pages>
+        <chars count='12'>
+            <char xadvance='13' x='2' chnl='0' yoffset='50' y='164' xoffset='0' id='32' page='0' height='0' width='0'/>
+            <char xadvance='16' x='2' chnl='0' yoffset='41' y='146' xoffset='4' id='46' page='0' height='16' width='16'/>
+            <char xadvance='28' x='48' chnl='0' yoffset='11' y='50' xoffset='1' id='48' page='0' height='46' width='36'/>
+            <char xadvance='36' x='2' chnl='0' yoffset='11' y='2' xoffset='0' id='49' page='0' height='46' width='44'/>
+            <char xadvance='37' x='2' chnl='0' yoffset='11' y='98' xoffset='1' id='50' page='0' height='46' width='42'/>
+            <char xadvance='31' x='122' chnl='0' yoffset='13' y='50' xoffset='1' id='51' page='0' height='44' width='34'/>
+            <char xadvance='39' x='2' chnl='0' yoffset='11' y='50' xoffset='1' id='52' page='0' height='46' width='42'/>
+            <char xadvance='34' x='90' chnl='0' yoffset='13' y='2' xoffset='0' id='53' page='0' height='44' width='38'/>
+            <char xadvance='30' x='86' chnl='0' yoffset='11' y='50' xoffset='0' id='54' page='0' height='46' width='34'/>
+            <char xadvance='36' x='48' chnl='0' yoffset='12' y='2' xoffset='0' id='55' page='0' height='46' width='40'/>
+            <char xadvance='32' x='130' chnl='0' yoffset='12' y='2' xoffset='0' id='56' page='0' height='46' width='36'/>
+            <char xadvance='29' x='48' chnl='0' yoffset='11' y='98' xoffset='0' id='57' page='0' height='46' width='34'/>
+       </chars>
+   </font>
