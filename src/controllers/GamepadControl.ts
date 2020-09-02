@@ -3,7 +3,6 @@ export default class GamepadControl {
   gamepad: Phaser.Input.Gamepad.Gamepad
   shouldSortChildren = true
   constructor(boxOpenCallback: () => void) {
-    // this.gamepad = gamepad
     this.boxOpenCallback = boxOpenCallback
   }
 
