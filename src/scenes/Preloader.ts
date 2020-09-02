@@ -16,6 +16,8 @@ export default class Preloader extends Phaser.Scene {
     this.load.image(TextureKeys.PARROT, 'assets/textures/parrot.png')
     this.load.image(TextureKeys.PENGUIN, 'assets/textures/penguin.png')
 
+    this.load.image(TextureKeys.UI_PANEL, 'assets/textures/grey_panel.png')
+
     this.load.audio(SoundKeys.MUSIC, 'assets/music/8Bit-Mini-Gamer-Loop.wav')
     this.load.audio(SoundKeys.SFX_BOX_SELECT, 'assets/sfx/Pickup-Soft.wav')
     this.load.audio(SoundKeys.SFX_GAMEOVER, 'assets/sfx/GameOver.wav')

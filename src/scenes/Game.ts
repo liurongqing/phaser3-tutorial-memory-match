@@ -1,8 +1,9 @@
 import { SceneKeys, TextureKeys, SoundKeys } from '~/consts/index'
 import CountdownControl from '~/controllers/CountdownControl'
 import PlayerControl from "~/controllers/PlayerControl";
-import GamepadControl from "~/controllers/GamepadControl";
-import { fadeIn, fadeOut } from '~/controllers/MusicUrils'
+// import GamepadControl from "~/controllers/GamepadControl";
+import StartModal from '~/controllers/StartModal'
+import { fadeIn, fadeOut } from '~/controllers/MusicUtils'
 
 const level = [
   [1, 0, 3],
@@ -10,16 +11,17 @@ const level = [
   [3, 4, 2]
 ]
 export default class Game extends Phaser.Scene {
-  cursors!: Phaser.Types.Input.Keyboard.CursorKeys
-  player!: Phaser.Physics.Arcade.Sprite
-  boxGroup!: Phaser.Physics.Arcade.StaticGroup
-  activeBox?: Phaser.Physics.Arcade.Sprite
-  itemsGroup!: Phaser.GameObjects.Group
-  selectedBoxes = []
-  matchesCount: number
-  countdown: any
-  control: any
-  music: Phaser.Sound.WebAudioSound
+  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
+  private player!: Phaser.Physics.Arcade.Sprite
+  private boxGroup!: Phaser.Physics.Arcade.StaticGroup
+  private activeBox?: Phaser.Physics.Arcade.Sprite
+  private itemsGroup!: Phaser.GameObjects.Group
+  private selectedBoxes = []
+  private matchesCount: number
+  private countdown: any
+  private control: any
+  private startModal?: StartModal
+  private music: Phaser.Sound.WebAudioSound
 
   constructor() {
     super(SceneKeys.GAME)
@@ -39,17 +41,16 @@ export default class Game extends Phaser.Scene {
       volume: 0.1
     }) as any
 
-    this.music.play()
-    fadeIn(this, this.music, 0.1, 2000)
+
   }
 
   create() {
     const { width, height } = this.scale
+
     this.player = this.physics.add.sprite(width * 0.5, height * 0.63, TextureKeys.SOKOBAN)
       .setSize(40, 16)
       .setOffset(12, 38)
       .play('down-idle')
-
 
     this.boxGroup = this.physics.add.staticGroup()
     this.createdBoxes()
@@ -68,13 +69,17 @@ export default class Game extends Phaser.Scene {
       .setOrigin(0.5)
 
     this.countdown = new CountdownControl(this, timerLabel)
-    this.countdown.start(this.handleCountdownFinished.bind(this), 100000)
+
 
     this.control = new PlayerControl(
       this.cursors,
       this.handlePlayerOpenActiveBox.bind(this)
     )
     // this.control = new GamepadControl(this.handlePlayerOpenActiveBox.bind(this))
+
+    this.startModal = new StartModal(this)
+    this.startModal.enter()
+
   }
 
   update() {
@@ -119,7 +124,20 @@ export default class Game extends Phaser.Scene {
   }
 
   handlePlayerOpenActiveBox() {
-    this.openBox(this.activeBox)
+    if (this.activeBox) {
+      this.openBox(this.activeBox)
+    } else if (this.startModal && !this.startModal.isExting) {
+      this.startModal.exit(() => {
+        this.countdown.start(this.handleCountdownFinished.bind(this), 100000)
+
+        this.music.play()
+        fadeIn(this, this.music, 0.1, 2000)
+
+        console.log('this.startModal', this.startModal)
+        this.startModal.destroy()
+        this.startModal = undefined
+      })
+    }
   }
 
   updateActiveBox() {

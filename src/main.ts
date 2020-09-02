@@ -1,3 +1,4 @@
+import { Plugin as NineSlicePlugin } from 'phaser3-nineslice'
 import scene from '~/scenes/index'
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -14,6 +15,11 @@ const config: Phaser.Types.Core.GameConfig = {
       debug: true,
       gravity: { y: 0 }
     }
+  },
+  plugins: {
+    global: [
+      NineSlicePlugin.DefaultCfg
+    ]
   },
   scene,
   input: {
