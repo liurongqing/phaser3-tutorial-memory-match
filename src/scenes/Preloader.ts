@@ -6,8 +6,12 @@ export default class Preloader extends Phaser.Scene {
     super(SceneKeys.PRELOADER)
   }
 
+  init(){
+    this.scene.run(SceneKeys.LOADING)
+  }
+
   preload() {
-    this.load.spritesheet('sokoban', 'assets/textures/sokoban_tilesheet.png', {
+    this.load.spritesheet(TextureKeys.SOKOBAN, 'assets/textures/sokoban_tilesheet.png', {
       frameWidth: 64
     })
     this.load.image(TextureKeys.BEAR, 'assets/textures/bear.png')
@@ -83,6 +87,7 @@ export default class Preloader extends Phaser.Scene {
       repeat: -1
     })
 
+    this.scene.stop(SceneKeys.LOADING)
     this.scene.start(SceneKeys.GAME)
   }
 }

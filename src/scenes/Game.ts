@@ -20,7 +20,7 @@ export default class Game extends Phaser.Scene {
   private matchesCount: number
   private countdown: any
   private control: any
-  private startModal?: StartModal
+  private startModal?: any
   private music: Phaser.Sound.WebAudioSound
 
   constructor() {
@@ -124,19 +124,24 @@ export default class Game extends Phaser.Scene {
   }
 
   handlePlayerOpenActiveBox() {
+    // console.log('openbox', this.startModal, this.scene.isActive(SceneKeys.GAME_OVER))
     if (this.activeBox) {
       this.openBox(this.activeBox)
     } else if (this.startModal && !this.startModal.isExting) {
       this.startModal.exit(() => {
-        this.countdown.start(this.handleCountdownFinished.bind(this), 100000)
+        this.countdown.start(this.handleCountdownFinished.bind(this), 3000)
 
         this.music.play()
         fadeIn(this, this.music, 0.1, 2000)
 
-        console.log('this.startModal', this.startModal)
-        this.startModal.destroy()
+        // console.log('this.startModal', this.startModal)
+        this.startModal?.destroy()
         this.startModal = undefined
       })
+    } else if (this.scene.isActive(SceneKeys.GAME_OVER)) {
+      console.log('scenekeys', SceneKeys.GAME_OVER)
+      this.scene.stop(SceneKeys.GAME_OVER)
+      this.scene.restart()
     }
   }
 
@@ -177,6 +182,8 @@ export default class Game extends Phaser.Scene {
         item.setTexture(TextureKeys.PENGUIN)
         break;
     }
+
+    if (!item) return
     box.setData('opened', true)
     item.setData('sorted', true)
     item.setDepth(2000)
@@ -210,6 +217,11 @@ export default class Game extends Phaser.Scene {
         this.checkForMatch()
       }
     })
+
+    if (this.activeBox) {
+      this.activeBox.setFrame(10)
+      this.activeBox = undefined
+    }
 
   }
 
@@ -255,13 +267,9 @@ export default class Game extends Phaser.Scene {
           this.player.active = false
           this.player.setVelocity(0, 0)
 
-
-          const { width, height } = this.scale
-          this.add.text(width * 0.5, height * 0.5, 'You Win!', {
-            fontSize: 48
+          this.scene.run(SceneKeys.GAME_OVER, {
+            message: 'You Win!'
           })
-            .setOrigin(0.5)
-            .setDepth(3000)
         }
       })
     })
@@ -298,15 +306,12 @@ export default class Game extends Phaser.Scene {
     this.sound.play(SoundKeys.SFX_GAMEOVER, {
       volume: 0.8
     })
-    const { width, height } = this.scale
+
     this.player.active = false
     this.player.setVelocity(0, 0)
-
-    this.add.text(width * 0.5, height * 0.5, 'You Lose', {
-      fontSize: 48
+    this.scene.run(SceneKeys.GAME_OVER, {
+      message: 'You lose!'
     })
-      .setOrigin(0.5)
-      .setDepth(3000)
   }
 
 }

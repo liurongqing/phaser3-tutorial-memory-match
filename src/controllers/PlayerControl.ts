@@ -11,7 +11,11 @@ export default class PlayerController {
 
 
   update(player: Phaser.Physics.Arcade.Sprite) {
-    if (!player.active) return
+    // console.log('player.active', player.active)
+    if (!player.active) {
+      this.handleActionButton()
+      return
+    }
     const speed = 200
     if (this.cursors.left.isDown) {
       player.setVelocity(-speed, 0)
@@ -36,6 +40,12 @@ export default class PlayerController {
       const direction = parts[0]
       player.play(`${direction}-idle`, true)
     }
+
+    this.handleActionButton()
+
+  }
+
+  handleActionButton() {
     const spaceJustPressed = Phaser.Input.Keyboard.JustUp(this.cursors.space)
     if (spaceJustPressed && this.boxOpenCallback) {
       this.boxOpenCallback()
