@@ -129,7 +129,7 @@ export default class Game extends Phaser.Scene {
       this.openBox(this.activeBox)
     } else if (this.startModal && !this.startModal.isExting) {
       this.startModal.exit(() => {
-        this.countdown.start(this.handleCountdownFinished.bind(this), 3000)
+        this.countdown.start(this.handleCountdownFinished.bind(this), 45000)
 
         this.music.play()
         fadeIn(this, this.music, 0.1, 2000)

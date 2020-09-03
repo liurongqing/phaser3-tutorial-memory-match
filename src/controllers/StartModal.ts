@@ -9,6 +9,10 @@ export default class StartModal {
     return this.state === 'exiting'
   }
 
+  get test() {
+    return this.state
+  }
+
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -21,9 +25,9 @@ export default class StartModal {
     this.startText = scene.add.text(width * 0.5, height * 1.5, 'Press A to Start', {
       fontSize: 32
     })
-    .setColor('#000000')
-    .setData('sorted', true)
-    .setOrigin(0.5)
+      .setColor('#000000')
+      .setData('sorted', true)
+      .setOrigin(0.5)
       .setDepth(10001)
   }
 
@@ -60,7 +64,7 @@ export default class StartModal {
   }
 
   destroy() {
-    this.panel.destroy()
-    this.startText.destroy()
+    this.panel.destroy(true)
+    this.startText.destroy(true)
   }
 }
