@@ -6,7 +6,7 @@ export default class Preloader extends Phaser.Scene {
     super(SceneKeys.PRELOADER)
   }
 
-  init(){
+  init() {
     this.scene.run(SceneKeys.LOADING)
   }
 
@@ -21,6 +21,7 @@ export default class Preloader extends Phaser.Scene {
     this.load.image(TextureKeys.PENGUIN, 'assets/textures/penguin.png')
 
     this.load.image(TextureKeys.UI_PANEL, 'assets/textures/grey_panel.png')
+    this.load.bitmapFont(TextureKeys.FONT_NUMBERS, 'assets/textures/mario-numbers.png', 'assets/textures/mario-numbers.fnt')
 
     this.load.audio(SoundKeys.MUSIC, 'assets/music/8Bit-Mini-Gamer-Loop.wav')
     this.load.audio(SoundKeys.SFX_BOX_SELECT, 'assets/sfx/Pickup-Soft.wav')

@@ -1,9 +1,19 @@
 export default class GamepadControl {
-  boxOpenCallback: () => void
+  scene: Phaser.Scene
   gamepad: Phaser.Input.Gamepad.Gamepad
   shouldSortChildren = true
-  constructor(boxOpenCallback: () => void) {
+  boxOpenCallback: () => void
+  constructor(scene: Phaser.Scene, boxOpenCallback: () => void) {
+    this.scene = scene
     this.boxOpenCallback = boxOpenCallback
+
+    scene.input.gamepad.on(Phaser.Input.Gamepad.Events.CONNECTED, (pad) => {
+      this.setGamepad(pad)
+    })
+
+    if (scene.input.gamepad.total > 0) {
+      this.setGamepad(scene.input.gamepad.pad1)
+    }
   }
 
   update(player: Phaser.Physics.Arcade.Sprite) {
@@ -44,7 +54,7 @@ export default class GamepadControl {
     this.gamepad = gamepad
   }
 
-  setChildrenSorted(){
+  setChildrenSorted() {
     this.shouldSortChildren = false
   }
 

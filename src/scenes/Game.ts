@@ -4,6 +4,7 @@ import PlayerControl from "~/controllers/PlayerControl";
 // import GamepadControl from "~/controllers/GamepadControl";
 import StartModal from '~/controllers/StartModal'
 import { fadeIn, fadeOut } from '~/controllers/MusicUtils'
+import { Tilemaps } from 'phaser';
 
 const level = [
   [1, 0, 3],
@@ -30,11 +31,6 @@ export default class Game extends Phaser.Scene {
   init() {
     this.cursors = this.input.keyboard.createCursorKeys()
     this.matchesCount = 0
-
-    this.input.gamepad.on(Phaser.Input.Gamepad.Events.CONNECTED, (pad) => {
-      if (!this.control || !this.control.setGamepad) return
-      this.control.setGamepad(pad)
-    })
 
     this.music = this.sound.add(SoundKeys.MUSIC, {
       loop: true,
@@ -63,9 +59,12 @@ export default class Game extends Phaser.Scene {
 
     this.itemsGroup = this.add.group()
 
-    const timerLabel = this.add.text(width * 0.5, 50, '', {
-      fontSize: 48
-    })
+    // const timerLabel = this.add.text(width * 0.5, 50, '', {
+    //   fontSize: 48
+    // })
+    //   .setOrigin(0.5)
+
+    const timerLabel = this.add.bitmapText(width * 0.5, 50, TextureKeys.FONT_NUMBERS, '50', 50)
       .setOrigin(0.5)
 
     this.countdown = new CountdownControl(this, timerLabel)
@@ -75,7 +74,7 @@ export default class Game extends Phaser.Scene {
       this.cursors,
       this.handlePlayerOpenActiveBox.bind(this)
     )
-    // this.control = new GamepadControl(this.handlePlayerOpenActiveBox.bind(this))
+    // this.control = new GamepadControl(this, this.handlePlayerOpenActiveBox.bind(this))
 
     this.startModal = new StartModal(this)
     this.startModal.enter()
@@ -249,30 +248,38 @@ export default class Game extends Phaser.Scene {
 
     ++this.matchesCount
 
-    this.time.delayedCall(1000, () => {
+    const handleGameWon = () => {
+      if (this.matchesCount >= 4) {
+        fadeOut(this, this.music, 2000)
+        this.sound.play(SoundKeys.SFX_VICTORY, {
+          volume: 0.8
+        })
+        this.countdown.stop()
+
+        this.player.active = false
+        this.player.setVelocity(0, 0)
+
+        this.scene.run(SceneKeys.GAME_OVER, {
+          message: 'You Win!'
+        })
+      }
+    }
+
+    const handleMatchmade = () => {
       first.box.setFrame(8)
       second.box.setFrame(8)
       this.sound.play(SoundKeys.SFX_MATCH, {
         volume: 0.8
       })
+      this.time.delayedCall(1000, handleGameWon)
+    }
 
-      this.time.delayedCall(1000, () => {
-        if (this.matchesCount >= 4) {
-          fadeOut(this, this.music, 2000)
-          this.sound.play(SoundKeys.SFX_VICTORY, {
-            volume: 0.8
-          })
-          this.countdown.stop()
+    this.time.delayedCall(1000, handleMatchmade)
+  }
 
-          this.player.active = false
-          this.player.setVelocity(0, 0)
 
-          this.scene.run(SceneKeys.GAME_OVER, {
-            message: 'You Win!'
-          })
-        }
-      })
-    })
+  handleGameWon() {
+
   }
 
   handleBearSelected() {

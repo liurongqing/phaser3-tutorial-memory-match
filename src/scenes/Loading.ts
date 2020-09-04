@@ -12,7 +12,8 @@ export default class Loading extends Phaser.Scene {
     const right = this.add.circle(width * 0.55, height * 0.5, 8, 0xffffff, 1)
 
     const loadingText = this.add.text(width * 0.5, height * 0.55, 'Loading', {
-      fontSize: 32
+      fontSize: 32,
+      fontFamily: 'Rowdies'
     })
       .setOrigin(0.5)
 
