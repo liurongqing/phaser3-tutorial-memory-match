@@ -1,4 +1,4 @@
-import { SceneKeys, TextureKeys, SoundKeys } from "~/consts/index";
+import { AnimationKeys, SceneKeys, SoundKeys, TextureKeys } from '~/consts/index'
 
 export default class Preloader extends Phaser.Scene {
 
@@ -33,28 +33,28 @@ export default class Preloader extends Phaser.Scene {
 
   create() {
     this.anims.create({
-      key: 'down-idle',
+      key: AnimationKeys.IDLE_DOWN,
       frames: [{ key: TextureKeys.SOKOBAN, frame: 52 }]
     })
 
     this.anims.create({
-      key: 'up-idle',
+      key: AnimationKeys.IDLE_UP,
       frames: [{ key: TextureKeys.SOKOBAN, frame: 55 }]
     })
 
     this.anims.create({
-      key: 'left-idle',
+      key: AnimationKeys.IDLE_LEFT,
       frames: [{ key: TextureKeys.SOKOBAN, frame: 81 }]
     })
 
     this.anims.create({
-      key: 'right-idle',
+      key: AnimationKeys.IDLE_RIGHT,
       frames: [{ key: TextureKeys.SOKOBAN, frame: 78 }]
     })
 
     this.anims.create({
-      key: 'down-walk',
-      frames: this.anims.generateFrameNumbers('sokoban', {
+      key: AnimationKeys.WALK_DOWN,
+      frames: this.anims.generateFrameNumbers(TextureKeys.SOKOBAN, {
         start: 52, end: 54
       }),
       frameRate: 10,
@@ -62,8 +62,8 @@ export default class Preloader extends Phaser.Scene {
     })
 
     this.anims.create({
-      key: 'up-walk',
-      frames: this.anims.generateFrameNumbers('sokoban', {
+      key: AnimationKeys.WALK_UP,
+      frames: this.anims.generateFrameNumbers(TextureKeys.SOKOBAN, {
         start: 55, end: 57
       }),
       frameRate: 10,
@@ -71,8 +71,8 @@ export default class Preloader extends Phaser.Scene {
     })
 
     this.anims.create({
-      key: 'left-walk',
-      frames: this.anims.generateFrameNumbers('sokoban', {
+      key: AnimationKeys.WALK_LEFT,
+      frames: this.anims.generateFrameNumbers(TextureKeys.SOKOBAN, {
         start: 81, end: 83
       }),
       frameRate: 10,
@@ -80,8 +80,8 @@ export default class Preloader extends Phaser.Scene {
     })
 
     this.anims.create({
-      key: 'right-walk',
-      frames: this.anims.generateFrameNumbers('sokoban', {
+      key: AnimationKeys.WALK_RIGHT,
+      frames: this.anims.generateFrameNumbers(TextureKeys.SOKOBAN, {
         start: 78, end: 80
       }),
       frameRate: 10,

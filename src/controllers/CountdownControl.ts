@@ -1,9 +1,8 @@
 export default class CountdownController {
   scene: Phaser.Scene
   label: Phaser.GameObjects.BitmapText
-  // label: Phaser.GameObjects.Text
   timerEvent: Phaser.Time.TimerEvent
-  duration: number
+  duration = 0
 
   constructor(scene: Phaser.Scene, label: Phaser.GameObjects.BitmapText) {
     this.scene = scene

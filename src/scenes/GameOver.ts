@@ -1,4 +1,4 @@
-import { SceneKeys, TextureKeys } from "~/consts/index";
+import { SceneKeys, TextureKeys } from '~/consts/index'
 
 export default class GameOver extends Phaser.Scene {
   private panel: Phaser.GameObjects.RenderTexture
@@ -29,14 +29,14 @@ export default class GameOver extends Phaser.Scene {
 
     this.tweens.add({
       targets: [this.panel, this.title],
-      y: height * 0.55,
+      y: height * 0.5,
       duration: 500,
       ease: Phaser.Math.Easing.Bounce.InOut
     })
 
     this.tweens.add({
       targets: this.caption,
-      y: height * 0.6,
+      y: height * 0.55,
       duration: 500,
       ease: Phaser.Math.Easing.Bounce.InOut
     })

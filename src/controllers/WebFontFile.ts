@@ -1,9 +1,10 @@
 import * as WebFontLoader from 'webfontloader'
 
 export default class WebFontFile extends Phaser.Loader.File {
-  fontNames: string[]
-  service: string
-  fontsLoadedCount: number
+  private fontNames: string[] = []
+  private service = 'google'
+  private fontsLoadedCount = 0
+
   constructor(loader: Phaser.Loader.LoaderPlugin, fontNames: string | string[], service = 'google') {
     super(loader, {
       type: 'webfont',
@@ -11,9 +12,8 @@ export default class WebFontFile extends Phaser.Loader.File {
     })
     this.fontNames = Array.isArray(fontNames) ? fontNames : [fontNames]
     this.service = service
-
-    this.fontsLoadedCount = 0
   }
+
   load() {
     const config = {
       fontactive: (familyName: string) => {

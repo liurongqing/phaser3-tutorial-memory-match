@@ -1,4 +1,5 @@
 import { SceneKeys } from '~/consts/index'
+
 export default class Loading extends Phaser.Scene {
   constructor() {
     super(SceneKeys.LOADING)

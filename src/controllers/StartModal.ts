@@ -1,18 +1,19 @@
 import { TextureKeys } from '~/consts/index'
+
+enum ModalState {
+  IDLE,
+  ENTERING,
+  EXITING
+}
 export default class StartModal {
-  panel: Phaser.GameObjects.RenderTexture
-  startText: Phaser.GameObjects.Text
-  scene: Phaser.Scene
-  state: 'idle' | 'entering' | 'exiting'
+  private scene: Phaser.Scene
+  private panel: Phaser.GameObjects.RenderTexture
+  private startText: Phaser.GameObjects.Text
+  private state = ModalState.IDLE
 
   get isExiting() {
-    return this.state === 'exiting'
+    return this.state === ModalState.EXITING
   }
-
-  get test() {
-    return this.state
-  }
-
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -23,7 +24,8 @@ export default class StartModal {
       .setDepth(10000)
 
     this.startText = scene.add.text(width * 0.5, height * 1.5, 'Press A to Start', {
-      fontSize: 32
+      fontSize: 32,
+      fontFamily: 'Rowdies'
     })
       .setColor('#000000')
       .setData('sorted', true)
@@ -31,40 +33,36 @@ export default class StartModal {
       .setDepth(10001)
   }
 
-
-  init() {
-    this.state = 'idle'
-  }
-
   enter() {
-    this.state = 'entering'
+    this.state = ModalState.ENTERING
+
     this.scene.tweens.add({
       targets: [this.panel, this.startText],
       y: this.scene.scale.height * 0.5,
       duration: 500,
       ease: Phaser.Math.Easing.Bounce.InOut,
       onComplete: () => {
-        this.state = 'idle'
+        this.state = ModalState.IDLE
       }
     })
   }
 
   exit(callback: () => void) {
-    this.state = 'exiting'
+    this.state = ModalState.EXITING
     this.scene.tweens.add({
       targets: [this.panel, this.startText],
       y: this.scene.scale.height * 1.5,
       duration: 300,
       ease: Phaser.Math.Easing.Bounce.InOut,
       onComplete: () => {
-        this.state = 'idle'
+        this.state = ModalState.IDLE
         callback?.()
       }
     })
   }
 
   destroy() {
-    this.panel.destroy(true)
-    this.startText.destroy(true)
+    this.panel.destroy()
+    this.startText.destroy()
   }
 }

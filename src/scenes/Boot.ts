@@ -1,4 +1,4 @@
-import { SceneKeys } from "~/consts/index";
+import { SceneKeys } from '~/consts/index'
 import WebFontLoader from '~/controllers/WebFontFile'
 
 export default class Boot extends Phaser.Scene {
@@ -7,11 +7,14 @@ export default class Boot extends Phaser.Scene {
   }
 
   preload() {
-    const fonts = new WebFontLoader(this.load, 'Rowdies')
+    const fonts = new WebFontLoader(this.load, [
+      'Rowdies',
+      'PT Sans'
+    ])
     this.load.addFile(fonts)
   }
 
-  create(){
+  create() {
     this.scene.start(SceneKeys.PRELOADER)
   }
 

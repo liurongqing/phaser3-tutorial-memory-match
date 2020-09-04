@@ -1,41 +1,46 @@
-import { SceneKeys, TextureKeys, SoundKeys } from '~/consts/index'
+import { AnimationKeys, SceneKeys, SoundKeys, TextureKeys } from '~/consts/index'
 import CountdownControl from '~/controllers/CountdownControl'
-import PlayerControl from "~/controllers/PlayerControl";
-// import GamepadControl from "~/controllers/GamepadControl";
-import StartModal from '~/controllers/StartModal'
+import KeyboardControl from '~/controllers/KeyboardControl'
 import { fadeIn, fadeOut } from '~/controllers/MusicUtils'
-import { Tilemaps } from 'phaser';
+import PlayerControl from '~/controllers/PlayerControl'
+import StartModal from '~/controllers/StartModal'
 
+// import GamepadControl from "~/controllers/GamepadControl"
 const level = [
   [1, 0, 3],
   [2, 4, 1],
   [3, 4, 2]
 ]
+
+interface BoxSelection {
+  box: Phaser.Physics.Arcade.Sprite,
+  item: Phaser.GameObjects.Sprite
+}
+
 export default class Game extends Phaser.Scene {
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
   private player!: Phaser.Physics.Arcade.Sprite
   private boxGroup!: Phaser.Physics.Arcade.StaticGroup
-  private activeBox?: Phaser.Physics.Arcade.Sprite
   private itemsGroup!: Phaser.GameObjects.Group
-  private selectedBoxes = []
-  private matchesCount: number
-  private countdown: any
-  private control: any
-  private startModal?: any
+
+  private activeBox?: Phaser.Physics.Arcade.Sprite
+  private selectedBoxes: BoxSelection[] = []
+  private countdown?: CountdownControl
+  private control?: PlayerControl
   private music: Phaser.Sound.WebAudioSound
+  private startModal?: StartModal
+  private matchesCount = 0
 
   constructor() {
     super(SceneKeys.GAME)
   }
 
   init() {
-    this.cursors = this.input.keyboard.createCursorKeys()
     this.matchesCount = 0
 
     this.music = this.sound.add(SoundKeys.MUSIC, {
       loop: true,
       volume: 0.1
-    }) as any
+    }) as Phaser.Sound.WebAudioSound
 
 
   }
@@ -46,10 +51,29 @@ export default class Game extends Phaser.Scene {
     this.player = this.physics.add.sprite(width * 0.5, height * 0.63, TextureKeys.SOKOBAN)
       .setSize(40, 16)
       .setOffset(12, 38)
-      .play('down-idle')
+      .play(AnimationKeys.IDLE_DOWN)
+
+    this.player.setCollideWorldBounds(true)
+
+    // this.control = new GamepadControl(this, this.handlePlayerOpenActiveBox.bind(this))
+    this.control = new KeyboardControl(
+      this,
+      this.handlePlayerOpenActiveBox.bind(this)
+    )
 
     this.boxGroup = this.physics.add.staticGroup()
     this.createdBoxes()
+    this.itemsGroup = this.add.group()
+
+    // const timerLabel = this.add.text(width * 0.5, 50, '', {
+    //   fontSize: 48
+    // })
+    //   .setOrigin(0.5)
+    const timerLabel = this.add.bitmapText(width * 0.5, 50, TextureKeys.FONT_NUMBERS, '50', 50)
+      .setOrigin(0.5)
+
+    this.countdown = new CountdownControl(this, timerLabel)
+
     this.physics.add.collider(
       this.boxGroup,
       this.player,
@@ -57,35 +81,16 @@ export default class Game extends Phaser.Scene {
       undefined,
       this)
 
-    this.itemsGroup = this.add.group()
-
-    // const timerLabel = this.add.text(width * 0.5, 50, '', {
-    //   fontSize: 48
-    // })
-    //   .setOrigin(0.5)
-
-    const timerLabel = this.add.bitmapText(width * 0.5, 50, TextureKeys.FONT_NUMBERS, '50', 50)
-      .setOrigin(0.5)
-
-    this.countdown = new CountdownControl(this, timerLabel)
-
-
-    this.control = new PlayerControl(
-      this.cursors,
-      this.handlePlayerOpenActiveBox.bind(this)
-    )
-    // this.control = new GamepadControl(this, this.handlePlayerOpenActiveBox.bind(this))
-
     this.startModal = new StartModal(this)
     this.startModal.enter()
 
   }
 
   update() {
-    this.control.update(this.player)
+    this.control?.update(this.player)
     this.updateActiveBox()
 
-    if (this.control.shouldSortChildren) {
+    if (this.control?.shouldSortChildren) {
       this.children.each(c => {
         const child = c as Phaser.Physics.Arcade.Sprite
         if (child.getData('sorted')) return
@@ -126,19 +131,18 @@ export default class Game extends Phaser.Scene {
     // console.log('openbox', this.startModal, this.scene.isActive(SceneKeys.GAME_OVER))
     if (this.activeBox) {
       this.openBox(this.activeBox)
-    } else if (this.startModal && !this.startModal.isExting) {
+    } else if (this.startModal && !this.startModal.isExiting) {
       this.startModal.exit(() => {
-        this.countdown.start(this.handleCountdownFinished.bind(this), 45000)
+        this.countdown.start(this.handleCountdownFinished.bind(this))
 
         this.music.play()
-        fadeIn(this, this.music, 0.1, 2000)
+        fadeIn(this, this.music, 0.05, 2000)
 
         // console.log('this.startModal', this.startModal)
         this.startModal?.destroy()
         this.startModal = undefined
       })
     } else if (this.scene.isActive(SceneKeys.GAME_OVER)) {
-      console.log('scenekeys', SceneKeys.GAME_OVER)
       this.scene.stop(SceneKeys.GAME_OVER)
       this.scene.restart()
     }
@@ -225,6 +229,7 @@ export default class Game extends Phaser.Scene {
   }
 
   checkForMatch() {
+    if (this.selectedBoxes.length <= 0) return
     const second = this.selectedBoxes.pop()
     const first = this.selectedBoxes.pop()
     if (first.item.texture !== second.item.texture) {
@@ -250,7 +255,7 @@ export default class Game extends Phaser.Scene {
 
     const handleGameWon = () => {
       if (this.matchesCount >= 4) {
-        fadeOut(this, this.music, 2000)
+        fadeOut(this, this.music)
         this.sound.play(SoundKeys.SFX_VICTORY, {
           volume: 0.8
         })
@@ -278,12 +283,9 @@ export default class Game extends Phaser.Scene {
   }
 
 
-  handleGameWon() {
-
-  }
-
   handleBearSelected() {
-    const { box, item } = this.selectedBoxes.pop()
+    if (this.selectedBoxes.length <= 0) return
+    const { box, item } = this.selectedBoxes.pop()!
     item.setTint(0xff0000)
     box.setFrame(7)
 
