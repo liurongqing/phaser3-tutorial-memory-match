@@ -12,6 +12,7 @@ const level = [
   [3, 4, 2]
 ]
 
+
 interface BoxSelection {
   box: Phaser.Physics.Arcade.Sprite,
   item: Phaser.GameObjects.Sprite

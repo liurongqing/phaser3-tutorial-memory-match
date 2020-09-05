@@ -1,12 +1,11 @@
 const path = require('path')
-const webpack = require('webpack')
 const { resolve } = path
 
 const config = {
   entry: './src/main.ts',
   output: {
     path: resolve('./docs'),
-    filename: 'game.js'
+    filename: '[name].js'
   },
   module: {
     rules: [{
@@ -15,12 +14,22 @@ const config = {
       exclude: /node_modules/,
     }]
   },
-  plugins: [
-    new webpack.IgnorePlugin({
-      resourceRegExp: /phaser/,
-      contextRegExp: /phaser/
-    })
-  ],
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      cacheGroups: {
+        defaultVendors: {
+          name: 'libs'
+        },
+        phaser: {
+          test: /phaser\.js/,
+          name: 'phaser',
+          priority: 1
+        }
+      }
+    }
+  },
+
   resolve: {
     extensions: ['.ts', '.js'],
     alias: {

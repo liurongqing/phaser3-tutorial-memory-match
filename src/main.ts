@@ -1,3 +1,5 @@
+import 'phaser'
+
 import { Plugin as NineSlicePlugin } from 'phaser3-nineslice'
 import scene from '~/scenes/index'
 
